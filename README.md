@@ -4,6 +4,78 @@
 
 ---
 
+## 설치 및 사용 방법
+
+### 빠른 시작
+
+```bash
+# 이 레포지토리를 클론
+git clone https://github.com/ykseong/ai-agents-for-dev.git
+cd ai-agents-for-dev
+
+# 설치 스크립트 실행 (글로벌 슬래시 커맨드 + 현재 디렉토리에 CLAUDE.md 설치)
+bash install.sh
+
+# 다른 프로젝트에 설치하는 경우
+bash install.sh /path/to/your-project
+```
+
+### 설치 결과
+
+| 항목 | 경로 | 설명 |
+|---|---|---|
+| 글로벌 슬래시 커맨드 | `~/.claude/commands/dev-agents.md` | 모든 프로젝트에서 `/dev-agents` 사용 가능 |
+| 프로젝트 컨텍스트 | `프로젝트루트/CLAUDE.md` | 해당 프로젝트에서 에이전트 역할 자동 활성화 |
+
+### 사용 방법 3가지
+
+**방법 1 — 슬래시 커맨드 (어느 프로젝트에서나)**
+
+설치 후 Claude Code에서 아래와 같이 입력한다.
+
+```
+/dev-agents 쇼핑몰을 만들어줘. 상품 목록, 장바구니, 결제 기능이 필요해
+```
+
+전체 워크플로우(요구사항 분석 → 설계 → 구현 → 검증 → 배포 → 문서화)가 자동으로 시작된다.
+
+**방법 2 — CLAUDE.md 기반 (프로젝트별 영구 설정)**
+
+`install.sh`로 프로젝트에 `CLAUDE.md`를 설치하면, 그 프로젝트의 모든 Claude Code 세션에서 에이전트 역할이 자동으로 활성화된다. 슬래시 커맨드 없이도 자연어로 에이전트를 지시할 수 있다.
+
+```
+# CLAUDE.md가 있는 프로젝트에서
+"QA Agent로서 이 코드를 테스트해줘"
+"Review Agent로서 보안 취약점을 검토해줘"
+"Database Agent로서 이 스키마를 최적화해줘"
+```
+
+**방법 3 — 수동 설치 (스크립트 없이)**
+
+```bash
+# 슬래시 커맨드만 설치
+mkdir -p ~/.claude/commands
+cp commands/dev-agents.md ~/.claude/commands/dev-agents.md
+
+# 프로젝트에 CLAUDE.md만 복사
+cp templates/CLAUDE.md /path/to/your-project/CLAUDE.md
+```
+
+### 파일 구조
+
+```
+ai-agents-for-dev/
+├── commands/
+│   └── dev-agents.md        ← 글로벌 슬래시 커맨드 정의
+├── templates/
+│   └── CLAUDE.md            ← 프로젝트용 에이전트 컨텍스트 템플릿
+├── install.sh               ← 설치 스크립트
+├── README.md
+└── multi-agent-system.md    ← 에이전트 상세 역할 정의
+```
+
+---
+
 ## 사용자 인터페이스: 어떻게 작업을 요청하는가
 
 사용자는 **PL Agent** 하나와만 대화한다. 나머지 에이전트는 사용자에게 직접 노출되지 않으며, 시스템 내부에서 자율적으로 협업한다.
