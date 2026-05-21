@@ -59,6 +59,48 @@ Claude Code 세션에서 작업 요청 시 아래 에이전트 역할 정의를 
 - 각 에이전트 산출물 취합 후 최신화
 - 산출물: `README.md`, `CHANGELOG.md`, `docs/api/`
 
+## Git 워크플로우 규칙
+
+### 리모트 저장소
+모든 작업 결과는 `https://github.com/ykseong/[프로젝트명]`에 자동으로 커밋·푸시한다.
+
+### 브랜치 전략
+- `main`: 검증 완료된 코드만 병합. 직접 커밋 금지
+- `feature/[기능명]`: 신규 기능 개발
+- `fix/[버그명]`: 버그 수정
+- `docs/[내용]`: 문서만 변경하는 경우
+
+### 커밋 메시지 컨벤션 (Conventional Commits)
+| 타입 | 사용 상황 | 예시 |
+|---|---|---|
+| `feat` | 새 기능 구현 (Coding Agent) | `feat: add user authentication API` |
+| `fix` | 버그 수정 (Coding Agent) | `fix: resolve null pointer in cart service` |
+| `refactor` | 코드 개선 (Review Agent 반영) | `refactor: simplify payment calculation logic` |
+| `test` | 테스트 코드 추가 (QA Agent) | `test: add integration tests for order flow` |
+| `docs` | 문서 작성 (Documentation/PL Agent) | `docs: add API reference and README` |
+| `ci` | CI/CD 설정 (DevOps Agent) | `ci: add GitHub Actions deployment pipeline` |
+| `chore` | 프로젝트 설정, 의존성 | `chore: initialize project with package.json` |
+
+### 자동 커밋·푸시 규칙
+각 에이전트는 자신의 산출물이 완성되는 즉시 아래 규칙으로 커밋하고 push한다.
+
+1. **커밋 단위**: 기능 단위로 쪼갠다. 하나의 커밋에 여러 기능을 묶지 않는다
+2. **즉시 push**: 커밋 후 바로 `git push origin [브랜치명]`을 실행한다
+3. **민감 정보 금지**: `.env`, 시크릿 키, 비밀번호가 포함된 파일은 절대 커밋하지 않는다. `.gitignore`로 반드시 제외한다
+4. **main 병합**: 모든 QA/Review 검증이 완료된 후에만 feature → main 병합한다
+
+### 단계별 커밋 시점
+```
+STEP 1 완료 → docs: add requirements and project plan
+STEP 2 완료 → docs: add architecture, UX, and database design
+STEP 3 (기능별) → feat: implement [기능명]
+STEP 5 (수정마다) → fix: [버그 요약] / refactor: [개선 요약]
+STEP 5 완료 → test: add test suite with [N]% coverage
+STEP 6 완료 → ci: add Docker and CI/CD pipeline
+STEP 7 완료 → docs: add project documentation
+STEP 8 완료 → main에 feature 브랜치 병합
+```
+
 ## 에스컬레이션 규칙
 
 - 에이전트는 자신의 책임 범위를 초과하는 결정을 독단적으로 내리지 않는다

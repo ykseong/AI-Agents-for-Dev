@@ -15,6 +15,40 @@ $ARGUMENTS
 
 ---
 
+### STEP 0 — Git 저장소 초기화
+
+요구사항 분석 전에 Git 환경을 준비한다.
+
+**저장소 이름 결정**
+- 사용자 요청에서 프로젝트 이름을 추출하여 kebab-case로 변환한다
+  - 예: "쇼핑몰" → `shopping-mall`, "할 일 관리 앱" → `todo-app`
+- 이름이 불분명하면 사용자에게 확인한다
+
+**Git 초기화 및 리모트 설정**
+```bash
+# 현재 디렉토리에 git이 없으면 초기화
+git init
+
+# .gitignore 생성 (기술 스택 확정 후 업데이트)
+curl -s https://www.toptal.com/developers/gitignore/api/node,python,macos,windows,linux > .gitignore
+
+# 리모트 설정 (github.com/ykseong/[프로젝트명])
+git remote add origin https://github.com/ykseong/[프로젝트명].git
+```
+
+**브랜치 전략**
+- `main` 브랜치: 검증 완료된 코드만 병합
+- 작업 브랜치: `feature/[기능명]` 형식으로 생성 후 작업
+
+```bash
+# 초기 커밋 후 main 보호, 작업 브랜치 생성
+git checkout -b feature/[기능명]
+```
+
+> GitHub에 저장소가 없으면 사용자에게 `github.com/ykseong/[프로젝트명]` 저장소를 먼저 생성해달라고 안내한다.
+
+---
+
 ### STEP 1 — 요구사항 분석
 
 사용자 요청을 분석하여 다음을 작성한다.
@@ -33,6 +67,16 @@ $ARGUMENTS
 - Phase 3: 고도화 (성능, UX 개선, 고급 기능)
 
 요구사항 분석이 완료되면 사용자에게 Phase 구성을 보여주고 진행 여부를 확인한다.
+
+**요구사항 문서 커밋**
+
+사용자 확인 후 요구사항 문서를 커밋한다.
+
+```bash
+git add docs/requirements.md docs/project-plan.md
+git commit -m "docs: add requirements and project plan"
+git push -u origin feature/[기능명]
+```
 
 ---
 
@@ -93,6 +137,16 @@ $ARGUMENTS
 
 세 에이전트의 결과를 취합하고 설계 간 충돌(API-스키마 불일치, UX-아키텍처 불일치 등)이 있으면 조율하여 최종 설계 문서를 완성한다.
 
+**설계 문서 커밋**
+
+```bash
+git add docs/architecture.md docs/tech-stack.md docs/api-contract.md \
+        docs/ux-flow.md docs/design-system.md \
+        docs/db-design.md migrations/
+git commit -m "docs: add architecture, UX, and database design"
+git push origin feature/[기능명]
+```
+
 ---
 
 ### STEP 3 — 구현 단계 (Coding Agent)
@@ -121,6 +175,18 @@ Agent 도구를 사용해 Coding Agent를 실행한다.
 - Architecture Agent가 정의한 설계 원칙을 반드시 준수하라
 
 구현이 완료되면 구현한 파일 목록과 각 파일의 역할을 요약하여 보고하라.
+
+각 기능 구현 완료 시 즉시 아래 형식으로 커밋하라:
+- 초기 설정: `chore: initialize project structure`
+- DB 모델: `feat: add database models and migrations`
+- API 구현: `feat: implement [기능명] API`
+- UI 구현: `feat: add [화면명] UI components`
+- 연동: `feat: integrate [A] with [B]`
+
+커밋 후 즉시 push한다:
+```bash
+git push origin feature/[기능명]
+```
 ```
 
 ---
@@ -187,6 +253,27 @@ QA Agent와 Review Agent의 결과를 취합하여 Critical/High 이슈 목록�
 Coding Agent가 수정을 완료하면 QA Agent에 재테스트를 요청한다.
 Critical/High 이슈가 모두 해소될 때까지 이 루프를 반복한다.
 
+**수정 사항 커밋 (루프 반복마다)**
+
+```bash
+# 버그 수정
+git add [수정된 파일들]
+git commit -m "fix: [버그 내용 요약]"
+
+# 리뷰 반영
+git add [수정된 파일들]
+git commit -m "refactor: [개선 내용 요약]"
+
+git push origin feature/[기능명]
+```
+
+검증 완료 후 테스트 코드도 커밋한다:
+```bash
+git add tests/ docs/test-cases.md docs/bug-report.md docs/review-report.md
+git commit -m "test: add unit and integration tests"
+git push origin feature/[기능명]
+```
+
 ---
 
 ### STEP 6 — 배포 설정 (DevOps Agent)
@@ -210,6 +297,14 @@ Agent 도구로 DevOps Agent를 실행한다.
 5. 배포 체크리스트 (프로덕션 배포 전 확인 사항)
 
 보안 시크릿이 코드에 하드코딩되지 않도록 환경 변수로 처리하라.
+```
+
+**DevOps 설정 커밋**
+
+```bash
+git add Dockerfile docker-compose.yml .github/ .env.example
+git commit -m "ci: add Docker and CI/CD pipeline configuration"
+git push origin feature/[기능명]
 ```
 
 ---
@@ -237,14 +332,33 @@ Agent 도구로 Documentation Agent를 실행한다.
 간결하고 실용적으로 작성하라. 불필요한 설명은 생략하라.
 ```
 
+**문서 커밋**
+
+```bash
+git add README.md CHANGELOG.md docs/api/
+git commit -m "docs: add project documentation and API reference"
+git push origin feature/[기능명]
+```
+
 ---
 
-### STEP 8 — 완료 보고
+### STEP 8 — main 병합 및 완료 보고
 
-사용자에게 최종 결과를 보고한다.
+모든 검증이 완료되면 feature 브랜치를 main에 병합하고 사용자에게 최종 결과를 보고한다.
+
+**main 병합**
+
+```bash
+git checkout main
+git merge --no-ff feature/[기능명] -m "feat: [기능명] 완료 (#Phase번호)"
+git push origin main
+```
+
+**완료 보고 내용**
 
 - 구현된 기능 목록
 - 생성된 파일 구조
 - 테스트 결과 요약
+- GitHub 커밋 히스토리 URL: `https://github.com/ykseong/[프로젝트명]/commits/main`
 - 다음 단계 안내 (실행 방법, 배포 방법)
 - Phase 2 진행 여부 확인 (해당하는 경우)

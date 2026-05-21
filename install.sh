@@ -28,7 +28,24 @@ print_info "모든 프로젝트에서 /dev-agents [요구사항] 으로 사용 �
 
 echo ""
 
-# ── 2. 현재 프로젝트에 CLAUDE.md 설정 여부 확인 ───────────────────────────
+# ── 2. GitHub CLI 설치 확인 ────────────────────────────────────────────────
+print_step "GitHub CLI(gh) 설치 확인..."
+
+if command -v gh &>/dev/null; then
+    print_ok "GitHub CLI 설치됨 ($(gh --version | head -1))"
+    if gh auth status &>/dev/null; then
+        print_ok "GitHub 로그인 상태 확인됨"
+    else
+        print_info "GitHub 로그인이 필요합니다: gh auth login"
+    fi
+else
+    print_info "GitHub CLI가 없습니다. 수동으로 저장소를 생성해야 합니다."
+    print_info "설치 방법: https://cli.github.com"
+fi
+
+echo ""
+
+# ── 4. 현재 프로젝트에 CLAUDE.md 설정 여부 확인 ───────────────────────────
 print_step "현재 프로젝트에 CLAUDE.md 설치 여부 확인..."
 
 TARGET_DIR="${1:-$(pwd)}"
@@ -50,18 +67,27 @@ fi
 
 echo ""
 
-# ── 3. 설치 완료 안내 ─────────────────────────────────────────────────────
+# ── 5. 설치 완료 안내 ─────────────────────────────────────────────────────
 echo "설치 완료"
 echo "=========="
 echo ""
+echo "GitHub 자동 커밋을 위한 사전 준비:"
+echo ""
+echo "  1. GitHub 저장소를 먼저 생성하세요 (github.com/ykseong/[프로젝트명])"
+echo "     또는 gh CLI 사용: gh repo create ykseong/[프로젝트명] --public"
+echo ""
+echo "  2. Claude Code에서 /dev-agents 실행 시"
+echo "     에이전트가 자동으로 git init, remote 설정, 단계별 commit·push를 수행합니다"
+echo ""
 echo "사용 방법:"
 echo ""
-echo "  방법 1 — 어느 프로젝트에서나 슬래시 커맨드로 시작"
+echo "  방법 1 — 슬래시 커맨드 (어느 프로젝트에서나)"
 echo "    /dev-agents 쇼핑몰을 만들어줘. 상품 목록, 장바구니, 결제 기능 필요해"
+echo "    → 단계별 커밋이 github.com/ykseong/shopping-mall 에 자동 push됩니다"
 echo ""
 echo "  방법 2 — 새 프로젝트에 CLAUDE.md 설치 후 사용"
 echo "    bash install.sh /path/to/your-project"
-echo "    → 해당 프로젝트에서 에이전트 역할이 자동으로 활성화됨"
+echo "    → 해당 프로젝트에서 에이전트 역할 및 git 규칙이 자동으로 활성화됩니다"
 echo ""
 echo "  방법 3 — 특정 에이전트 직접 지시"
 echo "    \"QA Agent로서 이 코드를 테스트해줘\""
