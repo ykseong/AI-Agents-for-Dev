@@ -99,6 +99,85 @@ ai-agents-for-dev/
 
 ---
 
+## Claude Desktop에서 사용하기
+
+Claude Desktop(macOS · Windows 데스크탑 앱)은 Claude Code CLI와 **동일한 설정 파일을 공유**한다.
+`install.sh` 또는 `install.ps1`을 한 번 실행하면 Desktop에서도 별도 설정 없이 바로 사용할 수 있다.
+
+### 슬래시 커맨드 사용 (CLI와 동일)
+
+```
+/dev-agents 재고 관리 시스템 만들어줘
+```
+
+입력 창에서 `/`를 입력하면 설치된 커맨드 목록이 나타난다. `dev-agents`를 선택하고 요구사항을 입력하면 된다.
+
+### Projects 기능으로 에이전트 컨텍스트 고정
+
+프로젝트를 만들고 `CLAUDE.md` 내용을 **Project Instructions**에 붙여 넣으면, 해당 프로젝트의 모든 대화에서 에이전트 역할이 자동으로 활성화된다. 매번 슬래시 커맨드를 쓰지 않아도 된다.
+
+**설정 방법**
+1. Claude Desktop → **Projects** → **New Project**
+2. 프로젝트 이름 입력 (예: `My App - Dev Agents`)
+3. **Project Instructions** 섹션에 `templates/CLAUDE.md` 전체 내용 붙여 넣기
+4. 이후 해당 프로젝트에서 자연어로 에이전트 지시
+
+```
+# Project Instructions가 적용된 프로젝트에서
+"PL Agent로서 사용자 인증 기능 요구사항을 분석해줘"
+"Coding Agent로서 로그인 API를 구현해줘"
+"QA Agent로서 작성한 코드를 테스트해줘"
+```
+
+### 자동 git 커밋 설정 (MCP Shell Server)
+
+Claude Desktop은 기본적으로 터미널 명령을 실행하지 못한다.
+git 자동 커밋·push를 활성화하려면 MCP Shell Server를 추가해야 한다.
+
+**macOS / Linux** — `~/.claude/claude_desktop_config.json` 편집:
+
+```json
+{
+  "mcpServers": {
+    "shell": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-bash"]
+    }
+  }
+}
+```
+
+**Windows** — `%APPDATA%\Claude\claude_desktop_config.json` 편집:
+
+```json
+{
+  "mcpServers": {
+    "shell": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-bash"]
+    }
+  }
+}
+```
+
+설정 후 Claude Desktop을 재시작하면 에이전트가 터미널 명령을 직접 실행할 수 있다.
+
+> **MCP 없이 사용할 경우**: 에이전트가 코드와 git 명령을 생성하고, 사용자가 터미널에서 직접 실행한다. 코드 생성과 설계 문서 작성은 MCP 없이도 완전히 동작한다.
+
+### CLI vs Desktop 기능 비교
+
+| 기능 | Claude Code CLI | Claude Desktop |
+|---|---|---|
+| `/dev-agents` 슬래시 커맨드 | ✅ | ✅ (공유) |
+| `CLAUDE.md` 자동 인식 | ✅ | ✅ (공유) |
+| Project Instructions | - | ✅ |
+| 에이전트 병렬 실행 | ✅ | 순차 실행 |
+| git 자동 커밋·push | ✅ | MCP 설정 시 ✅ |
+| 파일 첨부 (이미지·PDF) | ❌ | ✅ |
+| 브라우저 없이 사용 | ✅ | ✅ |
+
+---
+
 ## 사용자 인터페이스: 어떻게 작업을 요청하는가
 
 사용자는 **PL Agent** 하나와만 대화한다. 나머지 에이전트는 사용자에게 직접 노출되지 않으며, 시스템 내부에서 자율적으로 협업한다.
